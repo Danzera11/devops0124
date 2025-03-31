@@ -1,0 +1,34 @@
+FROM rockylinux:8
+MAINTAINER Rogerio Martinho
+
+ENV PORT=80
+
+# 1. Instalar pacotes essenciais (incluindo findutils)
+RUN dnf install -y httpd php mod_php php-mysqlnd findutils && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
+
+# 2. Configurar Apache corretamente
+RUN echo "ServerName localhost" >> /etc/httpd/conf/httpd.conf && \
+    sed -i 's/AllowOverride None/AllowOverride All/' /etc/httpd/conf/httpd.conf
+
+# 3. Garantir que o diretório de logs existe
+RUN mkdir -p /var/log/httpd && \
+    chown apache:apache /var/log/httpd
+
+# 4. Copiar arquivos
+COPY ./web/ /var/www/html/
+
+# 5. Ajustar permissões (agora com find disponível)
+RUN chown -R apache:apache /var/www/html && \
+    chmod -R 755 /var/www/html && \
+    find /var/www/html -type f -exec chmod 644 {} \;
+
+# 6. Arquivo de teste simplificado
+RUN echo "<?php header('Content-Type: text/plain'); echo 'PHP está funcionando!'; ?>" > /var/www/html/test.php
+
+EXPOSE $PORT
+
+# 7. Comando de inicialização
+CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
+
