@@ -1,0 +1,32 @@
+FROM ubuntu:20.04
+LABEL maintainer="Daniel Guerra daniel@asf.com"
+ENV PORT=80
+
+# Configurações para evitar prompts
+ENV DEBIAN_FRONTEND=noninteractive \
+    TZ=America/Sao_Paulo
+
+# Instalação
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    apache2 \
+    php \
+    libapache2-mod-php \
+    php-mysql \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configurar Apache
+RUN a2enmod php7.4 && \
+    a2dissite 000-default && \
+    echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
+    echo "DirectoryIndex index.php index.html" > /etc/apache2/conf-enabled/directory-index.conf
+
+# Copiar arquivos
+COPY ./web/ /var/www/html/
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html
+
+EXPOSE 80
+WORKDIR /var/www/html
+CMD ["apache2ctl", "-D", "FOREGROUND"]
