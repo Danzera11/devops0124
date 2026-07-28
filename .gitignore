@@ -1,2 +1,12 @@
 install.txt
 setup/
+.vagrant/
+.env
+.env.*
+*.key
+*.pem
+*.pfx
+*.p12
+*.sql
+*.dump
+*.bak

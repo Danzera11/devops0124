@@ -21,7 +21,7 @@
       mysql_db:
         name: backup
         login_user: root
-        login_password: ""
+        login_password: "{{ mysql_root_password }}"
         state: present
     - name: "importação base de dados backup.sql"
       mysql_db:
@@ -36,7 +36,7 @@
         login_user: root
         login_password: ""
         name: express
-        password: "REMOVED_EXPOSED_SECRET"
+        password: "{{ mysql_express_password }}"
         priv: "backup.*:ALL"
         state: present
         column_case_sensitive: false
